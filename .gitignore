@@ -1,0 +1,9 @@
+.terraform/
+.terragrunt-cache/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+backend.tf
+provider.tf
+*.tfvars
+!*.example.tfvars
