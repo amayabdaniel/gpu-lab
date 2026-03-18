@@ -29,16 +29,18 @@ cd /opt
 git clone https://github.com/NVIDIA/personaplex.git
 cd personaplex
 
-# Set HuggingFace token
-export HF_TOKEN="${hf_token}"
+# Retrieve HuggingFace token from GCP Secret Manager
+echo "Retrieving HF token from Secret Manager..."
+HF_TOKEN=$(gcloud secrets versions access latest --secret="hf-token" 2>/dev/null || echo "${hf_token}")
+export HF_TOKEN
 
 # Build container
 echo "Building PersonaPlex container..."
 docker compose build
 
-# Start PersonaPlex
+# Start PersonaPlex (token passed via env, not CLI args to avoid /proc leak)
 echo "Starting PersonaPlex..."
-HF_TOKEN="${hf_token}" docker compose up -d
+docker compose up -d
 
 echo "=== GPU Lab startup complete ==="
 echo "PersonaPlex available at https://$(curl -s ifconfig.me):8998"
