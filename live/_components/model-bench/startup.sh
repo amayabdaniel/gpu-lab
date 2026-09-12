@@ -34,7 +34,7 @@ docker run -d \
   --restart unless-stopped \
   -p 8080:8000 \
   -e VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 \
-  vllm/vllm-openai:latest \
+  vllm/vllm-openai:v0.6.4.post1 \
   --model Qwen/Qwen3-8B \
   --max-model-len 4096 \
   --gpu-memory-utilization 0.45
@@ -47,7 +47,7 @@ docker run -d \
   -p 3000:8080 \
   -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
   --add-host host.docker.internal:host-gateway \
-  ghcr.io/open-webui/open-webui:main
+  ghcr.io/open-webui/open-webui:v0.5.20
 
 echo "=== GPU Lab startup complete ==="
 echo "vLLM API: http://$(curl -s ifconfig.me):8080/v1"

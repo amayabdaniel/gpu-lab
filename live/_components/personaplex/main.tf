@@ -30,5 +30,10 @@ module "firewall" {
 
   name_prefix = "personaplex-${var.environment}"
   network     = var.network
-  app_ports   = ["8998"]
+
+  # No defaults upstream: an apply without explicit CIDRs fails rather than
+  # opening SSH and the unauthenticated inference ports to 0.0.0.0/0.
+  allowed_ssh_cidrs = var.allowed_ssh_cidrs
+  allowed_app_cidrs = var.allowed_app_cidrs
+  app_ports         = ["8998"]
 }

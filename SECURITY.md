@@ -17,14 +17,23 @@ DO NOT open public issues for security vulnerabilities.
 
 - GPU instances use Google's ML-optimized images with latest NVIDIA drivers
 - Firewall rules scope access to specific ports only
-- SSH access should be restricted to your IP (update `allowed_ssh_cidrs` in firewall module)
+- SSH access is restricted to the CIDRs you supply — `allowed_ssh_cidrs` is a
+  REQUIRED input with no default, and `terraform validate` rejects `0.0.0.0/0`
 - Instances are tagged for easy identification and cleanup
 - `make nuke` destroys all resources — no orphaned instances
 
 ## Network Security
 
-- Default firewall allows SSH from anywhere — restrict `allowed_ssh_cidrs` for production use
-- Application ports (8998, 8080, etc.) are open by default — restrict for production
+- There is no world-open default. `allowed_ssh_cidrs` and `allowed_app_cidrs` have
+  NO defaults and must be supplied in each component's terragrunt inputs; a plan
+  without them fails, and a plan supplying `0.0.0.0/0` fails validation.
+- This used to be guidance rather than enforcement: the defaults were
+  `["0.0.0.0/0"]`, none of the three terragrunt configs overrode them, and the
+  app ports include unauthenticated Ollama (8081/11434) and vLLM (8080). Every
+  apply opened those to the internet on a billed GPU host. Enforced in code
+  2026-09-12.
+- Container tags are pinned (`vllm-openai:v0.6.4.post1`, `open-webui:v0.5.20`).
+  Floating tags (`:latest`, `:main`) silently change what runs on reboot.
 - Consider using IAP (Identity-Aware Proxy) instead of direct SSH for production setups
 
 ## Cost Protection
