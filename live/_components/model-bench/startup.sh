@@ -18,8 +18,15 @@ apt-get update && apt-get install -y nvidia-container-toolkit
 nvidia-ctk runtime configure --runtime=docker
 systemctl restart docker
 
-# Install Ollama
-echo "Installing Ollama..."
+# Install Ollama.
+# OLLAMA_VERSION pins what install.sh downloads. Without it, ollama.com's
+# install script grabs the latest release — a floating tag on a runtime
+# that gets frequent updates, which is the same class as `:latest` image
+# tags (ADR-shape reasoning documented in gpu-lab SECURITY.md and
+# inferctl STATUS.md). Bump this constant deliberately, verify against
+# a real GPU boot, and update SECURITY.md's Network Security section.
+export OLLAMA_VERSION="v0.5.4"
+echo "Installing Ollama ${OLLAMA_VERSION}..."
 curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull a default model for quick testing

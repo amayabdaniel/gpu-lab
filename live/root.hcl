@@ -66,4 +66,14 @@ inputs = {
   project_id = local.project_id
   region     = local.region
   zone       = local.zone
+
+  # Firewall CIDRs come from env.hcl (which in turn reads env vars).
+  # Passing them here means every component below root.hcl inherits
+  # them automatically — the previous state left each component's
+  # terragrunt.hcl having to remember to pass them, which was the
+  # module-fixed-but-not-wired shape that made every apply since
+  # 2026-09-12 either fail loud (good) or depend on the operator
+  # remembering to set TF_VAR_* (fragile). This closes that gap.
+  allowed_ssh_cidrs = local.env_config.locals.allowed_ssh_cidrs
+  allowed_app_cidrs = local.env_config.locals.allowed_app_cidrs
 }
