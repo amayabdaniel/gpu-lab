@@ -39,6 +39,14 @@
   variable is missing from any component; no other module has the
   fixed-but-not-wired shape that the CIDR chain had before
   2026-09-19.
+- Provider integrity (2026-09-25): `.terraform.lock.hcl` is now
+  committed at each init directory (2 modules + 2 components), with
+  `hashicorp/google` pinned to `5.45.2` and sha256 hashes recorded
+  for both `darwin_arm64` and `linux_amd64`. Same class of pin as
+  the Ollama installer version and the vLLM/open-webui image tags
+  in `live/_components/model-bench/startup.sh` — an init that resolves
+  a different provider build now fails hash-verification loud instead
+  of silently proceeding.
 
 ## What this repo is NOT
 
@@ -68,7 +76,13 @@ Do work here only when at least one of these fires:
    `SECURITY.md`, treat any 0.0.0.0/0 or unpinned-runtime bug as a P0.
 4. **Terragrunt / provider bump.** Rerun `fmt -recursive -check`,
    `validate` on both modules, and `tflint`; a version bump that quietly
-   requires new variables would surface here.
+   requires new variables would surface here. After bumping a provider
+   version constraint in any `versions.tf`, regenerate the lock files
+   with `terraform providers lock -platform=darwin_arm64 -platform=linux_amd64`
+   in each of the 4 init directories (2 modules + 2 components) so the
+   next fleet-Mac and the next CI-Linux both see the same hash-verified
+   provider binary rather than whichever build the registry served
+   that day.
 5. **A cost anomaly on the GCP bill.** The `model-bench` component is
    the biggest single-invoice line here; before iterating on cost,
    check whether an instance is stuck up (the components are one-shot,
